@@ -11,16 +11,18 @@ calculate.addEventListener('click', () => {
         let a = 0;
         let b = 0;
         let c = 0;
-        let pageerror = "无法计算"
-        if (document.getElementsByClassName("list-box").length == 0) return pageerror
+        let pageError = "无法计算"
+        // alert(document.getElementsByClassName("cur-list").length)
+        // alert(document.getElementsByClassName("list-box").length)
+        if (document.getElementsByClassName("list-box").length == 0) return pageError + "1"
         let durations = document.getElementsByClassName("list-box")[0].getElementsByClassName("duration")
-        if (durations.length == 0) return pageerror
+        if (durations.length == 0) return pageError + "2"
 
         if (pstart > pend || pstart > durations.length || pend > durations.length || pstart < 1 || pend < 1) return "集数错误"
         for (let i = 0; i < durations.length; i++) {
             if (i >= (pstart - 1) && i < pend) {
                 let s = durations[i].innerHTML.split(/^(?:(\d+):)?(?:(\d+):)(\d+)$/);
-                if (s.length != 5) return pageerror
+                if (s.length != 5) return pageError + "3"
                 a += parseInt((s[1] != undefined) ? s[1] : 0);
                 b += parseInt(s[2]);
                 c += parseInt(s[3]);
@@ -37,9 +39,19 @@ calculate.addEventListener('click', () => {
         return a + ":" + b + ":" + c;
     }
 
-    chrome.tabs.executeScript({
-        code: '(' + modifyDOM + ')(' + num1 + ',' + num2 + ');' //argument here is a string but function.toString() returns function's code
-    }, (results) => {
-        document.getElementById("result").setAttribute("value", results);
-    });
+    // const tabId = window.tabs[0].id;
+    chrome.tabs.query({currentWindow: true, active: true}, function (tabArray) {
+        chrome.scripting.executeScript(//     {
+            //     code: '(' + modifyDOM + ')(' + num1 + ',' + num2 + ');' //argument here is a string but function.toString() returns function's code
+            // },
+            {
+                target: {tabId: tabArray[tabArray.length - 1].id}, // target: {allFrames: true},
+                func: modifyDOM, args: [num1, num2],
+            }, (results) => {
+                document.getElementById("result").setAttribute("value", results[0].result);
+            });
+
+    })
+
+
 });
