@@ -12,8 +12,6 @@ calculate.addEventListener('click', () => {
         let b = 0;
         let c = 0;
         let pageError = "无法计算"
-        // alert(document.getElementsByClassName("cur-list").length)
-        // alert(document.getElementsByClassName("list-box").length)
         if (document.getElementsByClassName("list-box").length == 0) return pageError + "1"
         let durations = document.getElementsByClassName("list-box")[0].getElementsByClassName("duration")
         if (durations.length == 0) return pageError + "2"
@@ -39,19 +37,12 @@ calculate.addEventListener('click', () => {
         return a + ":" + b + ":" + c;
     }
 
-    // const tabId = window.tabs[0].id;
     chrome.tabs.query({currentWindow: true, active: true}, function (tabArray) {
-        chrome.scripting.executeScript(//     {
-            //     code: '(' + modifyDOM + ')(' + num1 + ',' + num2 + ');' //argument here is a string but function.toString() returns function's code
-            // },
-            {
-                target: {tabId: tabArray[tabArray.length - 1].id}, // target: {allFrames: true},
-                func: modifyDOM, args: [num1, num2],
-            }, (results) => {
-                document.getElementById("result").setAttribute("value", results[0].result);
-            });
-
+        chrome.scripting.executeScript({
+            target: {tabId: tabArray[tabArray.length - 1].id}, // target: {allFrames: true},
+            func: modifyDOM, args: [num1, num2],
+        }, (results) => {
+            document.getElementById("result").setAttribute("value", results[0].result);
+        });
     })
-
-
 });
